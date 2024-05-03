@@ -1,12 +1,21 @@
 package com.midas.app.providers.external.stripe;
 
+import com.midas.app.exceptions.ApiException;
 import com.midas.app.models.Account;
 import com.midas.app.providers.payment.CreateAccount;
 import com.midas.app.providers.payment.PaymentProvider;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+import com.stripe.param.CustomerCreateParams;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,7 +39,29 @@ public class StripePaymentProvider implements PaymentProvider {
    * @return Account
    */
   @Override
-  public Account createAccount(CreateAccount details) {
-    throw new UnsupportedOperationException("Not implemented");
+  public Account createAccount(CreateAccount details) throws ApiException {
+    Stripe.apiKey = this.configuration.getApiKey();
+    var params =
+        CustomerCreateParams.builder()
+            .setEmail(details.getEmail())
+            .setName(String.format("%s %s", details.getFirstName(), details.getLastName()))
+            .build();
+    try {
+      var customer = Customer.create(params);
+      var createdAt =
+          OffsetDateTime.ofInstant(Instant.ofEpochMilli(customer.getCreated()), ZoneOffset.UTC);
+      var createdAccount =
+          Account.builder()
+              .email(customer.getEmail())
+              .createdAt(createdAt)
+              .firstName(details.getFirstName())
+              .lastName(details.getLastName())
+              .updatedAt(createdAt)
+              .build();
+
+      return createdAccount;
+    } catch (StripeException e) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
   }
 }

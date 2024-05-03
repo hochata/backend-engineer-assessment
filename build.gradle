@@ -58,12 +58,18 @@ dependencies {
     implementation 'io.gsonfire:gson-fire:1.9.0'
 
     implementation "com.stripe:stripe-java:24.14.0"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+    testImplementation 'org.mockito:mockito-core:5.1.1'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.3.1'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
-
 
 tasks.register('sonarlintListRules', SonarlintListRules) {
     description = 'List sonarlint rules'
@@ -118,7 +124,7 @@ spotless {
 
         // Cleanthat will refactor your code, but it may break your style: apply it before your formatter
         cleanthat()
-                .version("2.17")
+            .version("2.17")
 
         // Coding Style
         // Read more at https://google.github.io/styleguide/javaguide.html
@@ -135,6 +141,11 @@ sourceSets {
     main {
         java {
             srcDir("$buildDir/generated/openapi/src/main/java")
+        }
+    }
+    test {
+        java {
+            srcDir("test")
         }
     }
 }
@@ -160,18 +171,18 @@ tasks.register('_generateInternalOpenApi', GenerateTask) {
     modelNameSuffix.set("Dto")
 
     configOptions.set([
-            library          : 'spring-boot',
-            interfaceOnly    : 'true',
-            useBeanValidation: 'true',
-            openApiNullable  : 'false',
-            useSpringBoot3   : 'true',
-            useJakartaEe     : 'true',
+        library          : 'spring-boot',
+        interfaceOnly    : 'true',
+        useBeanValidation: 'true',
+        openApiNullable  : 'false',
+        useSpringBoot3   : 'true',
+        useJakartaEe     : 'true',
     ])
 }
 
 tasks.register('generateOpenApiSpecs') {
     dependsOn([
-            tasks._generateInternalOpenApi,
+        tasks._generateInternalOpenApi,
     ])
 }
 
@@ -180,4 +191,9 @@ tasks {
         dependsOn spotlessApply
         dependsOn tasks.generateOpenApiSpecs
     }
+}
+
+task startWorker(type: JavaExec) {
+    mainClass = 'com.midas.app.workers.DevServerWorker'
+    classpath = sourceSets.main.runtimeClasspath
 }
