@@ -15,10 +15,20 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "accounts")
 public class Account {
+  public enum Provider {
+    STRIPE,
+  }
+
   @Id
   @Column(name = "id")
   @GeneratedValue
   private UUID id;
+
+  @Column(name = "provider_id")
+  private String providerId;
+
+  @Column(name = "provider_type")
+  private Provider provider;
 
   @Column(name = "first_name")
   private String firstName;

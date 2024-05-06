@@ -27,6 +27,13 @@ components:
           description: "User's ID"
           readOnly: true
           example: "fba5b240-0e68-4e64-aca6-f12022dc4be3"
+        providerId:
+          type: string
+          description: "User id in the external provider"
+        providerType:
+          description: "External provider for the payments account"
+          type: string
+          enum: [STRIPE]
         firstName:
           type: string
           description: "User's first name"

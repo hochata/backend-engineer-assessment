@@ -55,6 +55,8 @@ public class StripePaymentProvider implements PaymentProvider {
       var createdAccount =
           Account.builder()
               .email(customer.getEmail())
+              .providerId(customer.getId())
+              .provider(Account.Provider.STRIPE)
               .createdAt(createdAt)
               .firstName(details.getFirstName())
               .lastName(details.getLastName())
