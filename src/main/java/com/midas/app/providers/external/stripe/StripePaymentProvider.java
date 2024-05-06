@@ -6,7 +6,6 @@ import com.midas.app.providers.payment.CreateAccount;
 import com.midas.app.providers.payment.PaymentProvider;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
-import com.stripe.model.Customer;
 import com.stripe.param.CustomerCreateParams;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -26,6 +25,8 @@ public class StripePaymentProvider implements PaymentProvider {
 
   private final StripeConfiguration configuration;
 
+  private final StripeClient stripeClient;
+
   /** providerName is the name of the payment provider */
   @Override
   public String providerName() {
@@ -40,6 +41,7 @@ public class StripePaymentProvider implements PaymentProvider {
    */
   @Override
   public Account createAccount(CreateAccount details) throws ApiException {
+    System.out.println(this.configuration.getApiKey());
     Stripe.apiKey = this.configuration.getApiKey();
     var params =
         CustomerCreateParams.builder()
@@ -47,7 +49,7 @@ public class StripePaymentProvider implements PaymentProvider {
             .setName(String.format("%s %s", details.getFirstName(), details.getLastName()))
             .build();
     try {
-      var customer = Customer.create(params);
+      var customer = this.stripeClient.createCustomer(params);
       var createdAt =
           OffsetDateTime.ofInstant(Instant.ofEpochMilli(customer.getCreated()), ZoneOffset.UTC);
       var createdAccount =
@@ -61,6 +63,7 @@ public class StripePaymentProvider implements PaymentProvider {
 
       return createdAccount;
     } catch (StripeException e) {
+      this.logger.error(e.getMessage());
       throw new ApiException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
   }

@@ -38,7 +38,8 @@ public class AccountServiceImpl implements AccountService {
 
     var workflow = workflowClient.newWorkflowStub(CreateAccountWorkflow.class, options);
 
-    return workflow.createAccount(details);
+    var account = workflow.createAccount(details);
+    return this.accountRepository.save(account);
   }
 
   /**

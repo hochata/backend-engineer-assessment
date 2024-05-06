@@ -1,6 +1,7 @@
 package com.midas.app.workers;
 
 import com.midas.app.activities.AccountActivityImpl;
+import com.midas.app.providers.external.stripe.StripeClientImpl;
 import com.midas.app.providers.external.stripe.StripeConfiguration;
 import com.midas.app.providers.external.stripe.StripePaymentProvider;
 import com.midas.app.workflows.CreateAccountWorkflow;
@@ -11,7 +12,13 @@ import io.temporal.worker.WorkerFactory;
 import java.io.IOException;
 import java.util.Properties;
 
-/** DevServerWorker */
+/**
+ * DevServerWorker
+ *
+ * <p>Temporal worker using the local development server.
+ *
+ * <p>Useful for testing on local without having to rely on Docker.
+ */
 public class DevServerWorker {
   private static String getStripeKey() throws IOException {
     var properties = new Properties();
@@ -30,7 +37,7 @@ public class DevServerWorker {
 
     var stripeConf = new StripeConfiguration();
     stripeConf.setApiKey(getStripeKey());
-    var stripe = new StripePaymentProvider(stripeConf);
+    var stripe = new StripePaymentProvider(stripeConf, new StripeClientImpl());
     worker.registerActivitiesImplementations(new AccountActivityImpl(stripe));
     factory.start();
   }
