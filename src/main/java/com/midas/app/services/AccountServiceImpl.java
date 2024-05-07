@@ -1,5 +1,6 @@
 package com.midas.app.services;
 
+import com.midas.app.exceptions.ResourceAlreadyExistsException;
 import com.midas.app.exceptions.ResourceNotFoundException;
 import com.midas.app.models.Account;
 import com.midas.app.providers.payment.UpdateAccount;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,6 +35,11 @@ public class AccountServiceImpl implements AccountService {
    */
   @Override
   public Account createAccount(Account details) {
+    var example = Example.of(Account.builder().email(details.getEmail()).build());
+    if (this.accountRepository.exists(example)) {
+      throw new ResourceAlreadyExistsException(details.getEmail());
+    }
+
     var options =
         WorkflowOptions.newBuilder()
             .setTaskQueue(CreateAccountWorkflow.QUEUE_NAME)
