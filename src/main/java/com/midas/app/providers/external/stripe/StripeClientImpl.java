@@ -14,9 +14,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class StripeClientImpl implements StripeClient {
-
   @Override
   public Customer createCustomer(CustomerCreateParams params) throws StripeException {
     return Customer.create(params);
+  }
+
+  @Override
+  public Customer retrieveCustomer(String customer) throws StripeException {
+    return Customer.retrieve(customer);
   }
 }

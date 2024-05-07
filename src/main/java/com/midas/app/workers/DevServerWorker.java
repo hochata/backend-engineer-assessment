@@ -6,6 +6,7 @@ import com.midas.app.providers.external.stripe.StripeConfiguration;
 import com.midas.app.providers.external.stripe.StripePaymentProvider;
 import com.midas.app.workflows.CreateAccountWorkflow;
 import com.midas.app.workflows.CreateAccountWorkflowImpl;
+import com.midas.app.workflows.UpdateAccountWorflowImpl;
 import io.temporal.client.WorkflowClient;
 import io.temporal.serviceclient.WorkflowServiceStubs;
 import io.temporal.worker.WorkerFactory;
@@ -33,7 +34,8 @@ public class DevServerWorker {
     var client = WorkflowClient.newInstance(service);
     var factory = WorkerFactory.newInstance(client);
     var worker = factory.newWorker(CreateAccountWorkflow.QUEUE_NAME);
-    worker.registerWorkflowImplementationTypes(CreateAccountWorkflowImpl.class);
+    worker.registerWorkflowImplementationTypes(
+        CreateAccountWorkflowImpl.class, UpdateAccountWorflowImpl.class);
 
     var stripeConf = new StripeConfiguration();
     stripeConf.setApiKey(getStripeKey());

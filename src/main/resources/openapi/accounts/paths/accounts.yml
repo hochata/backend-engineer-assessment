@@ -27,8 +27,7 @@ post:
     "403":
       $ref: "../../common/responses.yml#/components/responses/forbidden"
     "500":
-      $ref: "../../common/responses.yml#/components/responses/internalServerError"
-
+      $ref: "../../common/responses.yml#/components/responses/internalServerError"            
 get:
   summary: Get list of user accounts
   operationId: getUserAccounts

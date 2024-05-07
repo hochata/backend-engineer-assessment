@@ -1,5 +1,23 @@
 components:
   schemas:
+    updateAccount:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: "User's first name"
+          example: "John"
+          required: false
+        lastName:
+          type: string
+          description: "User's last name"
+          example: "Doe"
+          required: false
+        email:
+          type: string
+          description: "Email of user"
+          example: "john@doe.com"
+          required: false
     createAccount:
       type: object
       properties:

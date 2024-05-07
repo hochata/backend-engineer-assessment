@@ -13,4 +13,6 @@ import com.stripe.param.CustomerCreateParams;
  */
 public interface StripeClient {
   Customer createCustomer(CustomerCreateParams params) throws StripeException;
+
+  Customer retrieveCustomer(String customer) throws StripeException;
 }

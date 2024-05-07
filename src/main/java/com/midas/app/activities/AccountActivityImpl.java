@@ -4,6 +4,7 @@ import com.midas.app.exceptions.ApiException;
 import com.midas.app.models.Account;
 import com.midas.app.providers.payment.CreateAccount;
 import com.midas.app.providers.payment.PaymentProvider;
+import com.midas.app.providers.payment.UpdateAccount;
 
 /** AccountActivityImpl */
 public class AccountActivityImpl implements AccountActivity {
@@ -15,8 +16,13 @@ public class AccountActivityImpl implements AccountActivity {
 
   @Override
   public Account saveAccount(Account account) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'saveAccount'");
+    var params =
+        UpdateAccount.builder()
+            .email(account.getEmail())
+            .firstName(account.getFirstName())
+            .lastName(account.getLastName())
+            .build();
+    return this.provider.saveAccount(account.getProviderId(), params);
   }
 
   @Override

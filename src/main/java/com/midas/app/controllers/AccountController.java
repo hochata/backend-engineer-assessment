@@ -6,7 +6,10 @@ import com.midas.app.services.AccountService;
 import com.midas.generated.api.AccountsApi;
 import com.midas.generated.model.AccountDto;
 import com.midas.generated.model.CreateAccountDto;
+import com.midas.generated.model.UpdateAccountDto;
+import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,5 +58,15 @@ public class AccountController implements AccountsApi {
     var accountsDto = accounts.stream().map(Mapper::toAccountDto).toList();
 
     return new ResponseEntity<>(accountsDto, HttpStatus.OK);
+  }
+
+  @Override
+  public ResponseEntity<AccountDto> updateUserAccount(
+      UUID accountId, @Valid UpdateAccountDto updateAccountDto) {
+    logger.info("Updating information for user: " + accountId.toString());
+
+    var updatedAccount =
+        this.accountService.updateAccount(accountId, Mapper.toUpdateAccount(updateAccountDto));
+    return new ResponseEntity<>(Mapper.toAccountDto(updatedAccount), HttpStatus.OK);
   }
 }

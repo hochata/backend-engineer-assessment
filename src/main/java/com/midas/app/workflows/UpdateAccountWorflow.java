@@ -4,8 +4,10 @@ import com.midas.app.models.Account;
 import io.temporal.workflow.WorkflowInterface;
 import io.temporal.workflow.WorkflowMethod;
 
+/** UpdateAccountWorflow */
 @WorkflowInterface
-public interface CreateAccountWorkflow {
+public interface UpdateAccountWorflow {
+
   String QUEUE_NAME = "payment-account";
 
   /**
@@ -15,5 +17,5 @@ public interface CreateAccountWorkflow {
    * @return Account
    */
   @WorkflowMethod
-  Account createAccount(Account details);
+  Account upateAccount(Account details);
 }

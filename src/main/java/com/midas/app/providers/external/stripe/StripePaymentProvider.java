@@ -1,15 +1,15 @@
 package com.midas.app.providers.external.stripe;
 
 import com.midas.app.exceptions.ApiException;
+import com.midas.app.mappers.Mapper;
 import com.midas.app.models.Account;
 import com.midas.app.providers.payment.CreateAccount;
 import com.midas.app.providers.payment.PaymentProvider;
+import com.midas.app.providers.payment.UpdateAccount;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.param.CustomerCreateParams;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import com.stripe.param.CustomerUpdateParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -41,7 +41,6 @@ public class StripePaymentProvider implements PaymentProvider {
    */
   @Override
   public Account createAccount(CreateAccount details) throws ApiException {
-    System.out.println(this.configuration.getApiKey());
     Stripe.apiKey = this.configuration.getApiKey();
     var params =
         CustomerCreateParams.builder()
@@ -50,20 +49,29 @@ public class StripePaymentProvider implements PaymentProvider {
             .build();
     try {
       var customer = this.stripeClient.createCustomer(params);
-      var createdAt =
-          OffsetDateTime.ofInstant(Instant.ofEpochMilli(customer.getCreated()), ZoneOffset.UTC);
-      var createdAccount =
-          Account.builder()
-              .email(customer.getEmail())
-              .providerId(customer.getId())
-              .provider(Account.Provider.STRIPE)
-              .createdAt(createdAt)
-              .firstName(details.getFirstName())
-              .lastName(details.getLastName())
-              .updatedAt(createdAt)
-              .build();
 
-      return createdAccount;
+      return Mapper.toAccount(
+          customer, details.getFirstName(), details.getLastName(), Account.Provider.STRIPE);
+    } catch (StripeException e) {
+      this.logger.error(e.getMessage());
+      throw new ApiException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+  }
+
+  @Override
+  public Account saveAccount(String providerId, UpdateAccount details) {
+    var update =
+        CustomerUpdateParams.builder()
+            .setEmail(details.getEmail())
+            .setName(String.format("%s %s", details.getFirstName(), details.getLastName()))
+            .build();
+    Stripe.apiKey = this.configuration.getApiKey();
+    try {
+      var customer = this.stripeClient.retrieveCustomer(providerId);
+      customer.update(update);
+
+      return Mapper.toAccount(
+          customer, details.getFirstName(), details.getLastName(), Account.Provider.STRIPE);
     } catch (StripeException e) {
       this.logger.error(e.getMessage());
       throw new ApiException(HttpStatus.BAD_REQUEST, e.getMessage());

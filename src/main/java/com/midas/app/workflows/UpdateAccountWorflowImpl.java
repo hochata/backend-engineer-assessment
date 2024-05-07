@@ -6,17 +6,16 @@ import io.temporal.activity.ActivityOptions;
 import io.temporal.workflow.Workflow;
 import java.time.Duration;
 
-/** CreateAccountWorkflowImpl */
-public class CreateAccountWorkflowImpl implements CreateAccountWorkflow {
+/** UpdateAccountWorflowImpl */
+public class UpdateAccountWorflowImpl implements UpdateAccountWorflow {
 
   private final ActivityOptions options =
       ActivityOptions.newBuilder().setStartToCloseTimeout(Duration.ofSeconds(5)).build();
-
   private final AccountActivity activities =
       Workflow.newActivityStub(AccountActivity.class, options);
 
   @Override
-  public Account createAccount(Account details) {
-    return this.activities.createPaymentAccount(details);
+  public Account upateAccount(Account details) {
+    return this.activities.saveAccount(details);
   }
 }
