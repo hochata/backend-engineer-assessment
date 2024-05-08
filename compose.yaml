@@ -38,6 +38,8 @@ services:
           path: .
           target: /workspace/app
     restart: on-failure
+    labels:
+      org.springframework.boot.ignore: true
   postgres:
     image: 'postgres:16'
     environment:
