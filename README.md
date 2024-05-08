@@ -1,106 +1,82 @@
-# Getting Started
+# Code assessment
 
-**IMPORTANT: Do not send pull requests to this repository. This is a template repository and is not used for grading. Any pull requests will be closed and ignored.**
+## General design
 
-## Introduction
-
-If you are reading this, you are probably have received this project as a coding challenge. Please read the instructions
-carefully and follow the steps below to get started.
+I tried to follow the existing conventions and structure of the project. In particular I started out by completing the method stubs and implementing the required interfaces. When the functionality I was trying to implement was better in a separate class, I tried to add all the new pieces of code as new, small, testable services. The final version is meant to be run from the Docker image, but the local version can still be used.
 
 ## Setup
 
-### Pre-requisities
+### Prerequisites
 
 To run the application you would require:
 
-- [Java](https://www.azul.com/downloads/#zulu)
-- [Temporal](https://docs.temporal.io/cli#install)
-- [Docker](https://docs.docker.com/get-docker/)
+- [Java](https://adoptium.net/temurin/releases/)
+- [Docker](https://docs.docker.com/get-docker/) with [Docker Compose](https://docs.docker.com/compose/)
 - [Stripe API Keys](https://stripe.com/docs/keys)
-
-### On macOS:
-
-First, you need to install Java 21 or later. You can download it from [Azul](https://www.azul.com/downloads/#zulu) or
-use [SDKMAN](https://sdkman.io/).
-
-```sh
-brew install --cask zulu21
-```
-
-You can install Temporal using Homebrew
-
-```sh
-brew install temporal
-```
-
-or visit [Temporal Installation](https://docs.temporal.io/cli#install) for more information.
-
-You can install Docker using Homebrew
-
-```sh
-brew install docker
-```
-
-or visit [Docker Installation](https://docs.docker.com/get-docker/) for more information.
-
-### Other platforms
-
-Please check the official documentation for the installation of Java, Temporal, and Docker for your platform.
 
 ### Stripe API Keys
 
-Sign up for a Stripe account and get your API keys from the [Stripe Dashboard](https://dashboard.stripe.com/apikeys).
-Then in `application.properties` file add the following line with your secret key.
+Sign up for a Stripe account and get your API keys from the [Stripe Dashboard](https://dashboard.stripe.com/apikeys). Then in `application.properties` file add the following line with your secret key.
 
 ```properties
 stripe.api-key=sk_test_51J3j
 ```
 
-## Run
+If you do not add this key then the application will not work.
 
-You are required to first start the temporal server using the following command
+## Run the application
 
-```sh
-temporal server start-dev
-```
+### Run directly
 
-and then run the application using the following command or using your IDE.
+Run the application using the following command or using your IDE.
 
 ```sh
 ./gradlew bootRun
 ```
 
-### Other commands
+### Run in Docker
 
-#### Lint
-To run lint checks, use the following command
-
-```sh
-./gradlew sonarlintMain
-```
-
-#### Code Formatting
-To format the code, use the following command
+Ensure that the Docker daemon is running, then run
 
 ```sh
-./gradlew spotlessApply
+docker compose up
 ```
 
-## Guides
+It will take a few minutes to startup.
 
-The following guides illustrate how to use some features concretely:
+### Run tests
 
-- [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-- [Temporal Quick Start](https://docs.temporal.io/docs/quick-start)
-- [Temporal Java SDK Quick Guide](https://docs.temporal.io/dev-guide/java)
-- [Stripe Quick Start](https://stripe.com/docs/quickstart)
-- [Stripe Java SDK](https://stripe.com/docs/api/java)
+Run the unit tests with
+```sh
+./gradlew test
+```
 
-### Docker Compose support
+## Test the API
 
-This project contains a Docker Compose file named `compose.yaml`.
-In this file, the following services have been defined:
+Get the accounts
 
-- postgres: [`postgres:latest`](https://hub.docker.com/_/postgres)
+```sh
+curl 'http://localhost:8080/accounts'
+```
 
-Please review the tags of the used images and set them to the same as you're running in production.
+Create a new account
+
+```sh
+curl --header 'Content-Type: application/json' --data \
+'{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@doe.test"
+  }' \
+'http://localhost:8080/accounts'
+```
+
+Update existing account
+
+```sh
+ curl --request PATCH --header 'Content-Type: application/json' --data \
+'{
+  "firstName": "Alice"
+ }' \
+ 'http://localhost:8080/accounts/<accountId>'
+```
