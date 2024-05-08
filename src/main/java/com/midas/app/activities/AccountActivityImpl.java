@@ -5,8 +5,12 @@ import com.midas.app.models.Account;
 import com.midas.app.providers.payment.CreateAccount;
 import com.midas.app.providers.payment.PaymentProvider;
 import com.midas.app.providers.payment.UpdateAccount;
+import io.temporal.spring.boot.ActivityImpl;
+import org.springframework.stereotype.Component;
 
 /** AccountActivityImpl */
+@Component
+@ActivityImpl(taskQueues = "payment-account")
 public class AccountActivityImpl implements AccountActivity {
   private PaymentProvider provider;
 
