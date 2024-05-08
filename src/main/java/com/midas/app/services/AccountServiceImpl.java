@@ -92,7 +92,7 @@ public class AccountServiceImpl implements AccountService {
     logger.info("initiating workflow to update account for email: {}", account.getEmail());
     var workflow = workflowClient.newWorkflowStub(UpdateAccountWorflow.class, options);
 
-    var updatedAccount = workflow.upateAccount(account);
-    return this.accountRepository.save(updatedAccount);
+    workflow.upateAccount(account);
+    return this.accountRepository.save(account);
   }
 }
